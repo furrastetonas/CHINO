@@ -1,0 +1,451 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ */
+package alta.sql;
+
+import alta.sql.CP_GENERAL.ALTASQL;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Image;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableModel;
+import java.sql.ResultSet;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+/**
+ *
+ * @author Asrie
+ */
+public class CONSULTA_OBJETOSPERDIDOS extends javax.swing.JFrame {
+
+    /**
+     * Creates new form CONSULTA_TABLA_JAVA
+     */
+    public CONSULTA_OBJETOSPERDIDOS() {
+      
+        initComponents();
+        configurarRenderizadorTabla();
+        cargarDatosEnTabla();
+        
+ 
+    
+}
+    
+ 
+ public void mostrarUsuarioAutenticado(String usuario) {
+        System.out.println("Usuario autenticado: " + usuario);
+        
+ }
+    
+private void cargarDatosEnTabla() {
+    ResultSet rs = null;
+    Statement st = null;
+    Connection cn = null;
+
+    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+    
+    
+    model.setRowCount(0);
+
+    try {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        cn = DriverManager.getConnection("jdbc:mysql://localhost/cosasperdidas", "root", "");
+        String sql = "SELECT ID_OP, NAME_OP, DESC_OP, LUGAR_OP, EST_OP, IMG_OP_URL, USER_ID_OP FROM op";
+        st = cn.createStatement();
+        rs = st.executeQuery(sql);
+        while (rs.next()) {
+            int id = rs.getInt("ID_OP");
+            String nombre = rs.getString("NAME_OP");
+            String descripcion = rs.getString("DESC_OP");
+            String lugar = rs.getString("LUGAR_OP");
+            String estado = rs.getString("EST_OP");
+            String url = rs.getString("IMG_OP_URL");
+            String user = rs.getString( "USER_ID_OP");
+
+            ImageIcon imageIcon = null;
+            try {
+                imageIcon = new ImageIcon(new java.net.URL(url));
+                imageIcon = redimensionarImagen(imageIcon, 500, 500); 
+            } catch (Exception e) {
+                imageIcon = new ImageIcon(new ImageIcon("ruta/a/imagen_por_defecto.png")
+                        .getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH));
+            }
+
+            Object[] row = { imageIcon, id, nombre, descripcion, lugar, estado, user };
+            model.addRow(row);
+                   }
+    } catch (SQLException | ClassNotFoundException ex) {
+        JOptionPane.showMessageDialog(this, "Error al realizar la consulta: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        ex.printStackTrace();
+    } finally {
+        try {
+            if (rs != null) rs.close();
+            if (st != null) st.close();
+            if (cn != null) cn.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+}
+
+private ImageIcon redimensionarImagen(ImageIcon icon, int width, int height) {
+    Image img = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+    return new ImageIcon(img);
+}
+
+private void configurarRenderizadorTabla() {
+    jTable1.getColumnModel().getColumn(0).setPreferredWidth(200); 
+    jTable1.getColumnModel().getColumn(0).setMaxWidth(300);      
+
+    jTable1.setRowHeight(150); 
+
+    jTable1.getColumnModel().getColumn(0).setCellRenderer(new javax.swing.table.DefaultTableCellRenderer() {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            if (value instanceof ImageIcon) {
+                ImageIcon originalIcon = (ImageIcon) value;
+                Image scaledImage = originalIcon.getImage().getScaledInstance(table.getRowHeight(), table.getRowHeight(), Image.SCALE_SMOOTH);
+                JLabel label = new JLabel(new ImageIcon(scaledImage));
+                label.setHorizontalAlignment(SwingConstants.CENTER);
+                return label;
+            }
+            return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        }
+    });
+}
+
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setResizable(false);
+
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
+            },
+            new String [] {
+                "Imagen", "ID", "Nombre", "Descripcion", "Ubicacion", "Estado", "Usuario que publica"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, true
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jTable1.setCellSelectionEnabled(false);
+        jTable1.setRowSelectionAllowed(true);
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jTable1MousePressed(evt);
+            }
+        });
+        jScrollPane1.setViewportView(jTable1);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(30, 30, 30)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 902, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(22, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(24, 24, 24)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 513, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(26, Short.MAX_VALUE))
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+   
+      
+    }//GEN-LAST:event_jTable1MouseClicked
+
+    private void jTable1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MousePressed
+        // TODO add your handling code here:
+           int row = jTable1.getSelectedRow(); 
+        if (row != -1) { 
+            ImageIcon image = (ImageIcon) jTable1.getValueAt(row, 0); 
+            int id = (int) jTable1.getValueAt(row, 1);                
+            String nombre = (String) jTable1.getValueAt(row, 2);     
+            String descripcion = (String) jTable1.getValueAt(row, 3);
+            String ubicacion = (String) jTable1.getValueAt(row, 4);  
+            String estado = (String) jTable1.getValueAt(row, 5);    
+            String usuario = (String) jTable1.getValueAt(row, 6);
+            mostrarDetalles(image, id, nombre, descripcion, ubicacion, estado, usuario);
+    }//GEN-LAST:event_jTable1MousePressed
+
+}
+ String usuario= ALTA_SELECT_MODIFY_OP.usuario;
+public boolean selectin(int id) {
+    ResultSet rs = null;
+    PreparedStatement ps = null;  
+    Connection cn = null;
+    boolean autorizado = false; 
+
+    try {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        cn = DriverManager.getConnection("jdbc:mysql://localhost/cosasperdidas", "root", "");
+
+        String sql = "SELECT USER_ID_OP FROM op WHERE ID_OP = ?";
+        ps = cn.prepareStatement(sql);
+        ps.setInt(1, id);  
+
+        rs = ps.executeQuery();
+        if (rs.next()) {
+            String userEnRegistro = rs.getString("USER_ID_OP");
+            
+            if (usuario != null && usuario.equals(userEnRegistro)) {
+                autorizado = true; 
+            }
+        }
+    } catch (SQLException | ClassNotFoundException ex) {
+        System.out.println(ex.getMessage());
+        ex.printStackTrace();
+    } finally {
+        try {
+            if (rs != null) rs.close();
+            if (ps != null) ps.close();
+            if (cn != null) cn.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    return autorizado; 
+}
+
+    private void delete(int id){
+        Connection cn = null;
+        PreparedStatement pst = null;
+         try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            cn = DriverManager.getConnection("jdbc:mysql://localhost/cosasperdidas", "root", "");
+            System.out.println("Conectado");
+
+            String query = "DELETE FROM op WHERE ID_OP = ?";
+            pst = cn.prepareStatement(query);
+           
+            pst.setInt(1, id);
+            
+            System.out.println(pst);
+
+           pst.executeUpdate();
+           
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(ALTASQL.class.getName()).log(Level.SEVERE, "Error al cargar el driver", ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(ALTASQL.class.getName()).log(Level.SEVERE, "Error en la base de datos", ex);
+        } finally {
+            try {
+                if (pst != null) pst.close();
+                if (cn != null) cn.close();
+            } catch (SQLException e) {
+                Logger.getLogger(ALTASQL.class.getName()).log(Level.SEVERE, "Error al cerrar recursos", e);
+            }
+        }
+ }
+    
+    
+    
+    
+private static JFrame detallesFrameActivo = null;
+
+private void mostrarDetalles(ImageIcon image, int id, String nombre, String descripcion, String ubicacion, String estado, String user) {
+    if (detallesFrameActivo != null) {
+        detallesFrameActivo.dispose();
+    }
+    detallesFrameActivo = new JFrame("Detalles del objeto");
+    detallesFrameActivo.setSize(700, 700);  
+    detallesFrameActivo.setLocationRelativeTo(null); 
+    detallesFrameActivo.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); 
+
+    JPanel panel = new JPanel();
+    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS)); 
+    panel.setBackground(new Color(240, 240, 240)); 
+
+    detallesFrameActivo.add(panel, BorderLayout.CENTER);
+
+    JLabel titleLabel = new JLabel("Detalles del objeto");
+    titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+    titleLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+    titleLabel.setForeground(new Color(0, 102, 204));  
+    panel.add(titleLabel);
+    panel.add(Box.createVerticalStrut(10));  
+    
+    JLabel imageLabel = new JLabel();
+    imageLabel.setIcon(image);
+    imageLabel.setHorizontalAlignment(JLabel.CENTER);
+    imageLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+    imageLabel.setPreferredSize(new Dimension(300, 200)); 
+    panel.add(imageLabel);
+    panel.add(Box.createVerticalStrut(15));  
+
+    JLabel idLabel = new JLabel("ID: " + id);
+    idLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    idLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+    panel.add(idLabel);
+
+    JLabel nombreLabel = new JLabel("Nombre: " + nombre);
+    nombreLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    nombreLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+    panel.add(nombreLabel);
+
+    JLabel descripcionLabel = new JLabel("Descripción: " + descripcion);
+    descripcionLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    descripcionLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+    panel.add(descripcionLabel);
+
+    JLabel ubicacionLabel = new JLabel("Ubicación: " + ubicacion);
+    ubicacionLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    ubicacionLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+    panel.add(ubicacionLabel);
+
+    JLabel estadoLabel = new JLabel("Estado: " + estado);
+    estadoLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    estadoLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+    panel.add(estadoLabel);
+
+    JLabel userLabel = new JLabel("Usuario que publica: " + user);
+    userLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    userLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+    panel.add(userLabel);
+
+    panel.add(Box.createVerticalStrut(20));  
+    
+ JButton deleteButton = new JButton("Delete");
+    deleteButton.setFont(new Font("Arial", Font.BOLD, 14));
+    deleteButton.setBackground(Color.RED);
+    deleteButton.setForeground(Color.WHITE);
+    deleteButton.setFocusPainted(false);
+    deleteButton.setAlignmentX(JButton.CENTER_ALIGNMENT);
+    deleteButton.setPreferredSize(new Dimension(120, 40));
+    deleteButton.addActionListener(e -> {
+   
+    if (selectin(id)) {
+        int confirm = JOptionPane.showConfirmDialog(
+            detallesFrameActivo,
+            "¿Estás seguro de que deseas eliminar este objeto?",
+            "Confirmar eliminación",
+            JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            System.out.println("El objeto con ID " + id + " ha sido eliminado.");
+            delete(id);
+            detallesFrameActivo.dispose(); 
+        }
+    } else {
+        JOptionPane.showMessageDialog(
+            detallesFrameActivo,
+            "No tienes permisos para eliminar este objeto.",
+            "Permiso denegado",
+            JOptionPane.ERROR_MESSAGE
+        );
+    }
+});
+    panel.add(deleteButton);
+    JButton closeButton = new JButton("Cerrar");
+    closeButton.setFont(new Font("Arial", Font.BOLD, 14));
+    closeButton.setBackground(new Color(0, 102, 204));  
+    closeButton.setForeground(Color.WHITE); 
+    closeButton.setFocusPainted(false); 
+    closeButton.setAlignmentX(JButton.CENTER_ALIGNMENT);
+    closeButton.setPreferredSize(new Dimension(120, 40)); 
+    closeButton.addActionListener(e -> detallesFrameActivo.dispose());
+    panel.add(closeButton);
+
+    detallesFrameActivo.setResizable(false);
+    detallesFrameActivo.setVisible(true);
+}
+
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(CONSULTA_OBJETOSPERDIDOS.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(CONSULTA_OBJETOSPERDIDOS.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(CONSULTA_OBJETOSPERDIDOS.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(CONSULTA_OBJETOSPERDIDOS.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new CONSULTA_OBJETOSPERDIDOS().setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable jTable1;
+    // End of variables declaration//GEN-END:variables
+}
